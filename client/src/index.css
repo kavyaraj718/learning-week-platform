@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-2: #f9fafb;
+  --border: #e9eaf0;
+  --text: #14151a;
+  --text-muted: #6b7280;
+}
+
+.dark {
+  --bg: #0b0d12;
+  --surface: #14171f;
+  --surface-2: #1a1e28;
+  --border: #262b36;
+  --text: #f3f4f6;
+  --text-muted: #9aa3b2;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Themed primitives used across the app */
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    box-shadow: var(--tw-shadow, 0 1px 3px rgba(0,0,0,0.05));
+  }
+  .surface-2 { background: var(--surface-2); }
+  .muted { color: var(--text-muted); }
+  .input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 0.6rem;
+    padding: 0.55rem 0.8rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.18);
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    border-radius: 0.6rem; padding: 0.55rem 1rem; font-weight: 600;
+    transition: transform 0.08s ease, filter 0.15s ease, background 0.15s;
+    cursor: pointer; border: 1px solid transparent;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: linear-gradient(135deg,#6366f1,#4f46e5); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.07); }
+  .btn-ghost { background: var(--surface-2); color: var(--text); border-color: var(--border); }
+  .btn-ghost:hover { border-color: #818cf8; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.72rem; font-weight: 600; padding: 0.18rem 0.55rem;
+    border-radius: 999px; border: 1px solid var(--border);
+  }
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #818cf8; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}

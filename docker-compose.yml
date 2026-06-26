@@ -1,0 +1,60 @@
+# One-command startup:  docker compose up --build
+# Then open http://localhost:5173  (API on http://localhost:5000)
+#
+# Demo logins (seeded automatically on startup):
+#   admin@learningweek.test / admin123
+#   demo@learningweek.test  / password123
+#
+# NOTE: the server seeds the database every time it starts, which WIPES and
+# rebuilds the demo data. After your first run, if you want data to persist
+# across restarts, change the server `command` below to:  npm start
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: lw-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build: ./server
+    container_name: lw-server
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      PORT: "5000"
+      NODE_ENV: development
+      MONGO_URI: mongodb://mongo:27017/learning_week
+      JWT_SECRET: docker_dev_secret_change_me_in_prod
+      JWT_EXPIRES_IN: 7d
+      CLIENT_URL: http://localhost:5173
+      SOCIAL_SYNC_INTERVAL_MS: "0"
+    # Seed the DB, then start the API. Change to `npm start` to keep data.
+    command: sh -c "npm run seed && npm start"
+    ports:
+      - "5000:5000"
+
+  client:
+    build: ./client
+    container_name: lw-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    environment:
+      # Make the Vite dev proxy forward to the server service inside the network
+      PROXY_TARGET: http://server:5000
+    ports:
+      - "5173:5173"
+
+volumes:
+  mongo_data:

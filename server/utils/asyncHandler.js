@@ -1,0 +1,15 @@
+/**
+ * Wrap async route handlers so thrown errors flow to the central error handler
+ * instead of crashing the process or hanging the request.
+ */
+export const asyncHandler = (fn) => (req, res, next) =>
+  Promise.resolve(fn(req, res, next)).catch(next);
+
+export class ApiError extends Error {
+  constructor(statusCode, message) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
+export default asyncHandler;

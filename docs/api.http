@@ -1,0 +1,178 @@
+### Learning Week Platform — REST Client requests
+### Open in VS Code with the "REST Client" extension. Run "Login (Admin)" first,
+### copy the token from the response, and paste it into @token below.
+
+@baseUrl = http://localhost:5000/api
+@token = paste_token_here
+@employeeId = paste_employee_id_here
+@activityId = paste_activity_id_here
+@manager = Priya Nair
+
+### Health check
+GET {{baseUrl}}/health
+
+############################################################
+# Auth
+############################################################
+
+### Login (Admin) — copy "token" from the response into @token
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "admin@learningweek.test", "password": "admin123" }
+
+### Login (Employee)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "demo@learningweek.test", "password": "password123" }
+
+### Register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Jane Doe", "employeeId": "EMP2045", "email": "jane@company.com",
+  "password": "password123", "department": "Engineering", "location": "Mumbai",
+  "lob": "Technology", "manager": "Priya Nair", "designation": "Senior Analyst"
+}
+
+### Me
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+############################################################
+# Employees
+############################################################
+
+### List employees (grab an _id for @employeeId)
+GET {{baseUrl}}/employees
+Authorization: Bearer {{token}}
+
+### Employee dashboard
+GET {{baseUrl}}/employees/{{employeeId}}/dashboard
+Authorization: Bearer {{token}}
+
+### Points history
+GET {{baseUrl}}/employees/{{employeeId}}/points-history
+Authorization: Bearer {{token}}
+
+############################################################
+# Activities
+############################################################
+
+### List activities (grab an _id for @activityId)
+GET {{baseUrl}}/activities
+Authorization: Bearer {{token}}
+
+### Get one activity
+GET {{baseUrl}}/activities/{{activityId}}
+Authorization: Bearer {{token}}
+
+### Create activity (admin)
+POST {{baseUrl}}/activities
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "name": "New Workshop", "description": "Demo", "category": "Workshop",
+  "date": "2026-03-05", "time": "3:00 PM", "type": "Virtual", "participationPoints": 5 }
+
+### Enroll in an activity
+POST {{baseUrl}}/activities/{{activityId}}/enroll
+Authorization: Bearer {{token}}
+
+############################################################
+# Registrations / attendance / winners (admin)
+############################################################
+
+### Registrations for an activity
+GET {{baseUrl}}/activities/{{activityId}}/registrations
+Authorization: Bearer {{token}}
+
+### Toggle attendance
+PATCH {{baseUrl}}/activities/{{activityId}}/attendance
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "employeeId": "{{employeeId}}", "attended": true }
+
+### Assign winners
+POST {{baseUrl}}/activities/{{activityId}}/winners
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "first": "{{employeeId}}", "second": null, "third": null }
+
+############################################################
+# Points
+############################################################
+
+### Get config
+GET {{baseUrl}}/points/config
+Authorization: Bearer {{token}}
+
+### Update config (admin)
+PUT {{baseUrl}}/points/config
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "participationPoints": 5, "winnerPoints": { "first": 50, "second": 30, "third": 10 } }
+
+### Give bonus (admin)
+POST {{baseUrl}}/points/bonus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "employeeId": "{{employeeId}}", "amount": 20, "note": "Event facilitation" }
+
+############################################################
+# Leaderboards
+############################################################
+
+### Organization
+GET {{baseUrl}}/leaderboards/organization?limit=10
+Authorization: Bearer {{token}}
+
+### Team
+GET {{baseUrl}}/leaderboards/team
+Authorization: Bearer {{token}}
+
+### Team drill-down
+GET {{baseUrl}}/leaderboards/team/{{manager}}
+Authorization: Bearer {{token}}
+
+### Department
+GET {{baseUrl}}/leaderboards/department
+Authorization: Bearer {{token}}
+
+### Location
+GET {{baseUrl}}/leaderboards/location
+Authorization: Bearer {{token}}
+
+############################################################
+# Analytics (admin) · Recognition · Integration · Stats
+############################################################
+
+### Participation analytics
+GET {{baseUrl}}/analytics/participation
+Authorization: Bearer {{token}}
+
+### Trends
+GET {{baseUrl}}/analytics/trends
+Authorization: Bearer {{token}}
+
+### Recognition (6 awards)
+GET {{baseUrl}}/recognition
+Authorization: Bearer {{token}}
+
+### Social status
+GET {{baseUrl}}/integration/social/status
+Authorization: Bearer {{token}}
+
+### Social sync (admin)
+POST {{baseUrl}}/integration/social/sync
+Authorization: Bearer {{token}}
+
+### Live stats
+GET {{baseUrl}}/stats/live
+Authorization: Bearer {{token}}

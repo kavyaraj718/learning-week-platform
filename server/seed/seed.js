@@ -99,9 +99,13 @@ const enrollEmployee = async (employee, activity, markAttended = true) => {
     activity: activity._id,
     status: markAttended ? 'attended' : 'enrolled',
   });
-  if (!activity.enrolled.some((e) => e.equals(employee._id))) activity.enrolled.push(employee._id);
-  if (markAttended && !activity.attended.some((e) => e.equals(employee._id))) activity.attended.push(employee._id);
-  await activity.save();
+  // Update the activity's arrays atomically. Loading + .save() in a loop causes
+  // Mongoose VersionError ("No matching document ... version 0") when many
+  // enrollments touch the same activity in quick succession; $addToSet avoids it.
+  const update = markAttended
+    ? { $addToSet: { enrolled: employee._id, attended: employee._id } }
+    : { $addToSet: { enrolled: employee._id } };
+  await Activity.findByIdAndUpdate(activity._id, update);
   await awardParticipation(employee._id, activity);
 };
 
